@@ -1,5 +1,5 @@
 {
-    "name": "mauriciovander/vsf",
+    "name": "mauriciovander/Vsf",
     "description": "Very Simple Framework",
     "authors": [
         {
@@ -9,5 +9,8 @@
     ],
     "require": {
         "monolog/monolog": "^1.15"
+    },
+    "autoload": {
+        "psr-4": {"Vsf\\": "src/"}
     }
 }
