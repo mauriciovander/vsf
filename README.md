@@ -1,6 +1,9 @@
 # vsf
 Very Simple Framework
 
+git clone https://github.com/mauriciovander/vsf.git
+cd vsf
+composer install 
 
 This framework implements an MVC architecture
 and provides ready to use responses mechanisms to 
