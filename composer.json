@@ -1,5 +1,13 @@
 {
-    "autoload": {
-        "psr-4": {"vsf\\": "src/"}
+    "name": "mauriciovander/vsf",
+    "description": "Very Simple Framework",
+    "authors": [
+        {
+            "name": "Mauricio van der Maesen de Sombreff",
+            "email": "mauriciovander@gmail.com"
+        }
+    ],
+    "require": {
+        "monolog/monolog": "^1.15"
     }
 }
