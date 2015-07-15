@@ -10,6 +10,7 @@
     "require": {
         "monolog/monolog": "^1.15",
         "phpunit/phpunit": "4.7.7",
+        "propel/propel": "~2.0@dev"
     },
     "autoload": {
         "psr-4": {"Vsf\\": "src/"},
