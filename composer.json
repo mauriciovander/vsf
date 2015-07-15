@@ -4,13 +4,14 @@
     "authors": [
         {
             "name": "Mauricio van der Maesen de Sombreff",
-            "email": "mauriciovander@gmail.com"
+            "email": "mauriciovander@gmail.com",
         }
     ],
     "require": {
-        "monolog/monolog": "^1.15"
+        "monolog/monolog": "^1.15",
+        "phpunit/phpunit": "4.7.7",
     },
     "autoload": {
-        "psr-4": {"Vsf\\": "src/"}
+        "psr-4": {"Vsf\\": "src/"},
     }
 }
