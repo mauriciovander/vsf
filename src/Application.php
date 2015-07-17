@@ -8,6 +8,7 @@ class Application {
     private $context;
     private $route;
     private $params;
+    private $controller;
 
 // response_factory could be ApiResponseFactory or AjaxResponseFactory
     public function __construct($context, $argv = null) {
@@ -19,7 +20,8 @@ class Application {
     private function init($argv) {
         $this->selectResponseFromContext();
         $this->setRouteFromContext($argv);
-        $this->checkParams();
+        $this->setParamsFromContext($argv);
+        $this->loadControllerFile();
     }
 
     private function selectResponseFromContext() {
@@ -28,20 +30,53 @@ class Application {
         $this->response->setHeaders();
     }
 
+    private function setParamsFromContext($argv) {
+        $this->params = new \stdClass();
+        switch ($this->context) {
+            case \Vsf\Context::CLI:
+                $n = 0;
+                foreach ($argv as $param) {
+                    $this->params->{'p' . $n++} = $param;
+                }
+                break;
+            case \Vsf\Context::API:
+                foreach (array_keys($_POST) as $param) {
+                    $this->params->{$param} = filter_input(INPUT_POST, $key);
+                }
+                break;
+            case \Vsf\Context::AJAX:
+                foreach (array_keys($_POST) as $param) {
+                    $this->params->{$param} = filter_input(INPUT_POST, $key);
+                }
+                break;
+            case \Vsf\Context::CLI:
+                $rt = filter_input(INPUT_GET, 'rt');
+                $n = 0;
+                foreach (explode('/', $rt) as $param) {
+                    $this->params->{'p' . $n++} = $param;
+                }
+                break;
+        }
+    }
+
     private function setRouteFromContext($argv) {
         $route_strategy = new \Vsf\RouteStrategy($this->context, $argv);
         $this->route = $route_strategy->getRoute();
-        echo $this->route->getController();
-        echo $this->route->getAction();
-        echo json_encode($this->route->getParams());
     }
 
-    private function checkParams() {
-        $this->params = null;
+    public function loadControllerFile() {
+        $controller_name = ucwords($this->route->getController());
+        $controller_class = '\\application\\controllers\\' . $controller_name . 'Controller';
+        try {
+            $this->controller = new $controller_class($this->params, $this->response);
+        } catch (Exception $e) {
+            throw new \Vsf\ControllerNotFoundException($controller_name, 400, $e);
+        }
     }
 
-    private function run() {
-        
+    public function run() {
+        $method_name = $this->route->getAction();
+        $this->controller->$method_name();
     }
 
 }

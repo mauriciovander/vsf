@@ -104,17 +104,21 @@ class CliResponse implements \Vsf\ResponseFactory {
 
 abstract class JsonResponse {
 
-    private $message;
-    private $data;
+    protected $result;
+    protected $message;
+    protected $data;
 
     public function __construct($message = null, $data = null) {
         $this->message = $message;
         $this->data = $data;
+        $this->result = null;
     }
 
     public function __toString() {
         $response = new \stdClass();
-        $response->result = 'error';
+        if (!is_null($this->result)) {
+            $response->result = $this->result;
+        }
         if (!is_null($this->message)) {
             $response->message = $this->message;
         }
@@ -126,51 +130,69 @@ abstract class JsonResponse {
 
 }
 
+class JsonSuccessResponse extends \Vsf\JsonResponse {
+
+    public function __construct($message = null, $data = null) {
+        parent::__construct($message, $data);
+        $this->result = 'success';
+    }
+
+}
+
+class JsonErrorResponse extends \Vsf\JsonResponse {
+
+    public function __construct($message = null, $data = null) {
+        parent::__construct($message, $data);
+        $this->result = 'error';
+    }
+
+}
+
 // Concrete Product:
 // Error response for API context
-class ApiErrorResponse extends \Vsf\JsonResponse implements Response {
+class ApiErrorResponse extends \Vsf\JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for API context
-class ApiSuccessResponse extends \Vsf\JsonResponse implements Response {
+class ApiSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
     
 }
 
 // Concrete Product:
 // Error response for AJAX context
-class AjaxErrorResponse extends \Vsf\JsonResponse implements Response {
+class AjaxErrorResponse extends \Vsf\JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for AJAX context
-class AjaxSuccessResponse extends \Vsf\JsonResponse implements Response {
+class AjaxSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
     
 }
 
 // Concrete Product:
 // Error response for AJAX context
-class SiteErrorResponse extends \Vsf\JsonResponse implements Response {
+class SiteErrorResponse extends \Vsf\JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for AJAX context
-class SiteSuccessResponse extends \Vsf\JsonResponse implements Response {
+class SiteSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
     
 }
 
 // Concrete Product:
 // Error response for CLI context
-class CliErrorResponse extends \Vsf\JsonResponse implements Response {
+class CliErrorResponse extends \Vsf\JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for CLI context
-class CliSuccessResponse extends \Vsf\JsonResponse implements Response {
+class CliSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
     
 }
 
