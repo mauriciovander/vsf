@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
 <html>
     <head>
         <title>VSF</title>
@@ -12,5 +7,9 @@ and open the template in the editor.
     </head>
     <body>
         <div>VSF Simple Framework</div>
+        <pre>
+            <?php var_dump($input); ?>
+            <?php var_dump($model); ?>
+        </pre>
     </body>
 </html>

@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
+ */
+
 namespace vsf;
 
 use application\config\DB as config;
 
+/**
+ * Singleton Database connection class
+ * uses PDO
+ * @link http://php.net/manual/es/book.pdo.php
+ */
 class DB {
 
     public static $instance = null;
@@ -39,7 +49,7 @@ class DB {
     }
 
     private function __clone() {
-        
+        // avoid cloning this instance
     }
 
 }

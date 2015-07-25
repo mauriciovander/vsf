@@ -1,12 +1,15 @@
 <?php
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
  */
 
 require __DIR__ . '/../vendor/autoload.php';
+
+// Some usefull constants definnitions:
+define('BASEPATH',  realpath(__DIR__.'/..'));
+define('UUID', uniqid(true));
 
 $context = new \vsf\Context();
 

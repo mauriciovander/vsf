@@ -1,17 +1,27 @@
 <?php
 
+/*
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
+ */
+
 namespace vsf;
 
 use application\config\DB as config;
 
+/**
+ * Basic Model for simple CRUD applications
+ * Observers can suscribe to a model using addObserver to 
+ * monitor or log model interactions
+ */
 abstract class Model implements ModelInterface {
 
-    protected $observers;
     protected $data;
     protected $class_name;
     protected $table_name;
     protected $primary_key_name;
     protected $db_name;
+    protected $observers;
     private $db;
 
     public function __construct() {
@@ -24,24 +34,46 @@ abstract class Model implements ModelInterface {
         $this->primary_key_name = 'id_' . $this->table_name;
     }
 
+    /*
+     * set a field value in $this->data
+     * @example $model->field_name = 'field_value';
+     */
     public function __set($name, $value) {
         $this->data[$name] = $value;
     }
 
+    /*
+     * get a field value from $this->data
+     * @example $field_value = $model->field_name;
+     */
     public function __get($name) {
         return $this->data[$name];
     }
 
+    /**
+     * Suscribes an Observer to the model
+     * @example $model->addObserver(new ModelObserver());
+     * @param \vsf\ModelObserverInterface $observer
+     */
     public function addObserver(ModelObserverInterface $observer) {
         $this->observers[] = $observer;
     }
 
+    /**
+     * Notify every registered observers
+     * $this->data is sent to every observer
+     * @param string $subject
+     */
     private function notifyObservers($subject) {
         foreach ($this->observers as $observer) {
             $observer->update($this->class_name, $subject, $this->data);
         }
     }
 
+    /**
+     * saves model changes in the database table using PDO connection
+     * @throws ModelUpdateException
+     */
     public function update() {
         try {
 
@@ -71,6 +103,10 @@ abstract class Model implements ModelInterface {
         }
     }
 
+    /**
+     * deletes model from the database table using PDO connection
+     * @throws ModelDeleteException
+     */
     public function delete() {
         try {
             $sql = 'delete from ' . $this->db_name . '.' . $this->table_name
@@ -86,6 +122,10 @@ abstract class Model implements ModelInterface {
         }
     }
 
+    /**
+     * Insert a new row into the database table using PDO connection
+     * @throws ModelInsertException
+     */
     public function create() {
         try {
             $prepared = [];
@@ -116,6 +156,12 @@ abstract class Model implements ModelInterface {
         }
     }
 
+    /**
+     * Retrieves model information from the database table using PDO connection
+     * @param type $id
+     * @return boolean
+     * @throws ModelLoadException
+     */
     public function load($id) {
         try {
             $sql = 'select *'
@@ -134,10 +180,16 @@ abstract class Model implements ModelInterface {
 
             $this->notifyObservers('load');
         } catch (Exception $e) {
-            throw new ModelInsertException($this->class_name, 500, $e);
+            throw new ModelLoadException($this->class_name, 500, $e);
         }
     }
 
+    /**
+     * Retrieves the information of last model inserted into 
+     * the database table using PDO connection
+     * @return boolean
+     * @throws ModelLoadException
+     */
     public function loadLast() {
         try {
             $sql = 'select *'
@@ -156,10 +208,16 @@ abstract class Model implements ModelInterface {
 
             $this->notifyObservers('load');
         } catch (Exception $e) {
-            throw new ModelInsertException($this->class_name, 500, $e);
+            throw new ModelLoadException($this->class_name, 500, $e);
         }
     }
 
+    /**
+     * Retrieves the information of first model inserted into 
+     * the database table using PDO connection
+     * @return boolean
+     * @throws ModelLoadException
+     */
     public function loadFirst() {
         try {
 
@@ -179,10 +237,14 @@ abstract class Model implements ModelInterface {
 
             $this->notifyObservers('load');
         } catch (Exception $e) {
-            throw new ModelInsertException($this->class_name, 500, $e);
+            throw new ModelLoadException($this->class_name, 500, $e);
         }
     }
 
+    /**
+     * Get model information
+     * @return array $this->data
+     */
     public function getData() {
         return $this->data;
     }
@@ -197,12 +259,18 @@ interface ModelInterface {
 }
 
 /**
- *  Model Observers
+ *  Model Observer Interface
  */
 interface ModelObserverInterface {
 
+    /**
+     * @param string $model
+     * @param string $subject
+     * @param mixed $data
+     */
     public function update($model, $subject, $data);
 }
+
 
 class ModelObserver implements ModelObserverInterface {
 

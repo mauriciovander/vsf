@@ -1,6 +1,12 @@
 <?php
 
+/*
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
+ */
+
 namespace vsf;
+
 use application\config\Application as config;
 
 interface RouteInterface {
@@ -13,6 +19,7 @@ interface RouteInterface {
 }
 
 abstract class Route {
+
     private $controller;
     private $action;
     private $params;
@@ -29,20 +36,21 @@ class CliRoute extends Route implements RouteInterface {
         $action = \trim(\reset($argv));
         $this->action = \filter_var($action, \FILTER_SANITIZE_STRING);
         \array_shift($argv);
-        $this->params = array();
+        $this->params = new \stdClass();
+        $p = 0;
         if (!is_null($argv)) {
             foreach ($argv as $param) {
-                $this->params[] = \filter_var($param, \FILTER_SANITIZE_ENCODED);
+                $this->params->{'p' . $p++} = \filter_var($param, \FILTER_SANITIZE_ENCODED);
             }
         }
     }
 
     public function getController() {
-        return empty($this->controller)?config::DEFAULT_CLI_CONTROLLER:$this->controller;
+        return empty($this->controller) ? config::DEFAULT_CLI_CONTROLLER : $this->controller;
     }
 
     public function getAction() {
-        return empty($this->action)?config::DEFAULT_CLI_ACTION:$this->action;
+        return empty($this->action) ? config::DEFAULT_CLI_ACTION : $this->action;
     }
 
     public function getParams() {
@@ -61,18 +69,18 @@ class AjaxRoute extends Route implements RouteInterface {
         \array_shift($route);
         $action = \trim(\reset($route));
         $this->action = \filter_var($action, \FILTER_SANITIZE_STRING);
-        $this->params = array();
+        $this->params = new \stdClass();
         foreach (\array_keys($_POST) as $key) {
-            $this->params[$key] = \filter_input(\INPUT_POST, $key, \FILTER_SANITIZE_ENCODED);
+            $this->params->{$key} = \filter_input(\INPUT_POST, $key, \FILTER_SANITIZE_ENCODED);
         }
     }
 
     public function getController() {
-        return empty($this->controller)?config::DEFAULT_AJAX_CONTROLLER:$this->controller;
+        return empty($this->controller) ? config::DEFAULT_AJAX_CONTROLLER : $this->controller;
     }
 
     public function getAction() {
-        return empty($this->action)?config::DEFAULT_AJAX_ACTION:$this->action;
+        return empty($this->action) ? config::DEFAULT_AJAX_ACTION : $this->action;
     }
 
     public function getParams() {
@@ -86,26 +94,25 @@ class SiteRoute extends Route implements RouteInterface {
     public function __construct() {
         $rt = \filter_input(\INPUT_GET, 'rt');
         $route = \explode('/', $rt);
-        $controller = \trim(\reset($route));
-        $this->controller = \filter_var($controller, \FILTER_SANITIZE_STRING);
+        $this->controller = \trim(\reset($route));
         \array_shift($route);
-        $action = \trim(\reset($route));
-        $this->action = \filter_var($action, \FILTER_SANITIZE_STRING);
+        $this->action = \trim(\reset($route));
         \array_shift($route);
-        $this->params = array();
+        $this->params = new \stdClass();
+        $p = 0;
         if (!is_null($route)) {
             foreach ($route as $param) {
-                $this->params[] = \filter_var($param, \FILTER_SANITIZE_ENCODED);
+                $this->params->{'p' . $p++} = \filter_var($param, \FILTER_SANITIZE_ENCODED);
             }
         }
     }
 
     public function getController() {
-        return empty($this->controller)?config::DEFAULT_SITE_CONTROLLER:$this->controller;
+        return empty($this->controller) ? config::DEFAULT_SITE_CONTROLLER : $this->controller;
     }
 
     public function getAction() {
-        return empty($this->action)?config::DEFAULT_SITE_ACTION:$this->action;
+        return empty($this->action) ? config::DEFAULT_SITE_ACTION : $this->action;
     }
 
     public function getParams() {
@@ -124,18 +131,18 @@ class ApiRoute extends Route implements RouteInterface {
         \array_shift($route);
         $action = \trim(\reset($route));
         $this->action = \filter_var($action, \FILTER_SANITIZE_STRING);
-        $this->params = array();
+        $this->params = new \stdClass();
         foreach (\array_keys($_POST) as $key) {
-            $this->params[$key] = \filter_input(\INPUT_POST, $key, \FILTER_SANITIZE_ENCODED);
+            $this->params->{$key} = \filter_input(\INPUT_POST, $key, \FILTER_SANITIZE_ENCODED);
         }
     }
 
     public function getController() {
-        return empty($this->controller)?config::DEFAULT_API_CONTROLLER:$this->controller;
+        return empty($this->controller) ? config::DEFAULT_API_CONTROLLER : $this->controller;
     }
 
     public function getAction() {
-        return empty($this->action)?config::DEFAULT_API_ACTION:$this->action;
+        return empty($this->action) ? config::DEFAULT_API_ACTION : $this->action;
     }
 
     public function getParams() {

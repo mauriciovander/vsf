@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
+ */
+
 namespace vsf;
 
 class Application {
@@ -12,28 +17,15 @@ class Application {
 
 // response_factory could be ApiResponseFactory or AjaxResponseFactory
     public function __construct($context, $argv = null) {
-        $this->registerErrorHandlers();
         $this->context = $context;
         $this->init($argv);
         $this->run();
     }
 
-    public function undefinedMethodErrorHandler() {
-        $error = error_get_last();
-        if (!is_null($error)) {
-            if(strpos($error['message'], 'Call to undefined method')===0)
-                echo $this->response->error('Invalid method',$this->route);
-        }
-    }
-
-    private function registerErrorHandlers() {
-        register_shutdown_function(array(self, 'undefinedMethodErrorHandler'));
-    }
-
     private function init($argv) {
         $this->selectResponseFromContext();
         $this->setRouteFromContext($argv);
-        $this->setParamsFromContext($argv);
+        $this->setParams();
         $this->loadControllerFile();
     }
 
@@ -43,39 +35,13 @@ class Application {
         $this->response->setHeaders();
     }
 
-    private function setParamsFromContext($argv) {
-        $this->params = new \stdClass();
-
-        switch ($this->context) {
-            case Context::CLI:
-                $n = 0;
-                foreach ($argv as $param) {
-                    $this->params->{'p' . $n++} = $param;
-                }
-                break;
-            case Context::API:
-                foreach (array_keys($_POST) as $param) {
-                    $this->params->{$param} = filter_input(INPUT_POST, $key);
-                }
-                break;
-            case Context::AJAX:
-                foreach (array_keys($_POST) as $param) {
-                    $this->params->{$param} = filter_input(INPUT_POST, $key);
-                }
-                break;
-            case Context::SITE:
-                $rt = filter_input(INPUT_GET, 'rt');
-                $n = 0;
-                foreach (explode('/', $rt) as $param) {
-                    $this->params->{'p' . $n++} = $param;
-                }
-                break;
-        }
-    }
-
     private function setRouteFromContext($argv) {
         $route_strategy = new RouteStrategy($this->context, $argv);
         $this->route = $route_strategy->getRoute();
+    }
+
+    private function setParams() {
+        $this->params = $this->route->getParams();
     }
 
     public function loadControllerFile() {

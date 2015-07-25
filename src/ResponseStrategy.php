@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
+ */
+
 namespace vsf;
 
 // Abstract Product:
@@ -65,12 +70,12 @@ class AjaxResponse implements ResponseFactory {
 // Response for AJAX context
 class SiteResponse implements ResponseFactory {
 
-    public function error($message = null, $data = null) {
-        return new SiteErrorResponse($message, $data);
+    public function error($view = null, $data = null) {
+        return new SiteErrorResponse($view, $data);
     }
 
-    public function success($message = null, $data = null) {
-        return new SiteSuccessResponse($message, $data);
+    public function success($view = null, $data = null) {
+        return new SiteSuccessResponse($view, $data);
     }
 
     public function setHeaders() {
@@ -173,15 +178,47 @@ class AjaxSuccessResponse extends JsonSuccessResponse implements Response {
 }
 
 // Concrete Product:
-// Error response for AJAX context
-class SiteErrorResponse extends JsonErrorResponse implements Response {
-    
+// Error response for Site context
+class SiteErrorResponse implements Response {
+
+    private $view_file;
+    private $data;
+
+    public function __construct($view = null, $data = null) {
+        $this->data = $data;
+        $this->view_file = $view;
+    }
+
+    public function __toString() {
+        foreach ($this->data as $key => $value) {
+            $$key = $value;
+        }
+        include BASEPATH . '/application/views/' . $this->view_file;
+        return '';
+    }
+
 }
 
 // Concrete Product:
-// Successful response for AJAX context
-class SiteSuccessResponse extends JsonSuccessResponse implements Response {
-    
+// Successful response for Site context
+class SiteSuccessResponse implements Response {
+
+    private $view_file;
+    private $data;
+
+    public function __construct($view = null, $data = null) {
+        $this->data = $data;
+        $this->view_file = $view;
+    }
+
+    public function __toString() {
+        foreach ($this->data as $key => $value) {
+            $$key = $value;
+        }
+        include BASEPATH . '/application/views/' . $this->view_file;
+        return '';
+    }
+
 }
 
 // Concrete Product:

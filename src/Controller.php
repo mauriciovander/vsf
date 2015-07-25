@@ -1,7 +1,17 @@
 <?php
 
+/*
+ * @author      Mauricio van der Maesen <mauriciovander@gmail.com>
+ * @link        https://github.com/mauriciovander/vsf
+ */
+
 namespace vsf;
 
+/**
+ * Basic controller class
+ * @param stdClass $params
+ * @param ResponseFactory $response
+ */
 abstract class Controller {
 
     protected $response;
@@ -10,10 +20,13 @@ abstract class Controller {
     public function __construct(\stdClass $params = null, ResponseFactory $response = null) {
         $this->params = $params;
         $this->response = $response;
-            }
+    }
 
 }
 
+/**
+ * Controller Exceptions
+ */
 abstract class ControllerException extends \Exception {
 
     public function __construct($message = null, $code = 500, Exception $previous = null) {
@@ -23,6 +36,10 @@ abstract class ControllerException extends \Exception {
 
 }
 
+
+/*
+ *  @throws ControllerNotFoundException
+ */
 class ControllerNotFoundException extends ControllerException {
 
     public function __construct($controller_name = null, $code = 500, Exception $previous = null) {
