@@ -1,0 +1,14 @@
+Options -Indexes
+Options -Multiviews
+RewriteEngine on
+RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK)
+RewriteRule .* - [F]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond $1 !\.(ico)$ [NC]
+RewriteRule ^(.*)$ index.php?rt=$1 [L,QSA]
+RewriteCond %{HTTPS} !=on
+SetEnv ENVIRONMENT "DEVELOPMENT"
+
+
+
