@@ -10,7 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $context = new \vsf\Context();
 
-if ($argc) {
+if (isset($argc)) {
     $params = $argv;
 } else {
     $params = array();

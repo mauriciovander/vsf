@@ -16,11 +16,10 @@ abstract class Model implements ModelInterface {
 
     public function __construct() {
         $this->db = DB::getInstance();
-
         $this->observers = [];
         $this->data = [];
         $this->class_name = get_class($this);
-        $this->db_name = config;
+        $this->db_name = config::DATABASE;
         $this->table_name = strtolower(substr(end(explode('/', get_class($this))), -4));
         $this->primary_key_name = 'id_' . $this->table_name;
     }
@@ -57,14 +56,14 @@ abstract class Model implements ModelInterface {
                     . ' set ' . implode(',', $prepared_sql)
                     . ' where ' . $this->primary_key_name . '=:id';
 
-            $this->db->prepare($sql);
+            $prepared_statement = $this->db->prepare($sql);
 
             foreach ($this->data as $key => $value) {
-                $this->db->bindParam($prepared);
+                $prepared_statement->bindParam($prepared);
             }
-            $this->db->bindParam(':id', $this->{$this->primary_key_name});
+            $prepared_statement->bindParam(':id', $this->{$this->primary_key_name});
 
-            $this->db->execute();
+            $prepared_statement->execute();
 
             $this->notifyObservers('update');
         } catch (Exception $e) {
@@ -77,11 +76,9 @@ abstract class Model implements ModelInterface {
             $sql = 'delete from ' . $this->db_name . '.' . $this->table_name
                     . ' where ' . $this->primary_key_name . '=:id';
 
-            $this->db->prepare($sql);
-
-            $this->db->bindParam(':id', $this->{$this->primary_key_name});
-
-            $this->db->execute();
+            $prepared_statement = $this->db->prepare($sql);
+            $prepared_statement->bindParam(':id', $this->{$this->primary_key_name});
+            $prepared_statement->execute();
 
             $this->notifyObservers('delete');
         } catch (Exception $e) {
@@ -89,7 +86,7 @@ abstract class Model implements ModelInterface {
         }
     }
 
-    public function insert() {
+    public function create() {
         try {
             $prepared = [];
             foreach ($this->data as $key => $value) {
@@ -97,15 +94,23 @@ abstract class Model implements ModelInterface {
             }
 
             $sql = 'insert into ' . $this->db_name . '.' . $this->table_name
-                    . ' (' . implode(',', array_keys($this->data)) . ') values'
-                    . ' (' . implode(',', array_keys($prepared)) . ')';
+                    . ' (' . $this->primary_key_name;
+            if (count($this->data)) {
+                $sql .= ',' . implode(',', array_keys($this->data));
+            }
+            $sql .= ') values (null';
+            if (count($this->data)) {
+                $sql .= ',' . implode(',', array_keys($prepared));
+            }
+            $sql .= ')';
 
-            $this->db->prepare($sql);
-            $this->db->bindParam($prepared);
+            $prepared_statement = $this->db->prepare($sql);
 
-            $this->db->execute();
-
-            $this->notifyObservers('insert');
+            if ($prepared_statement->execute()) {
+                $this->load($this->db->lastInsertId());
+            }
+            
+            $this->notifyObservers('create');
         } catch (Exception $e) {
             throw new ModelInsertException($this->class_name, 500, $e);
         }
@@ -117,21 +122,15 @@ abstract class Model implements ModelInterface {
                     . ' from ' . $this->db_name . '.' . $this->table_name
                     . ' where ' . $this->primary_key_name . '=:id limit 1';
 
-            $this->db->prepare($sql);
-
-            $this->db->bindParam(':id', $id);
-
-            $results = $this->db->execute();
+            $prepared_statement = $this->db->prepare($sql);
+            $prepared_statement->execute(array(':id' => $id));
+            $results = $prepared_statement->fetchAll();
 
             if (!$results) {
                 return false;
             }
 
-            $row = reset($results);
-
-            foreach ($row as $key => $value) {
-                $this->data->{$key} = $value;
-            }
+            $this->data = reset($results);
 
             $this->notifyObservers('load');
         } catch (Exception $e) {
@@ -145,21 +144,16 @@ abstract class Model implements ModelInterface {
                     . ' from ' . $this->db_name . '.' . $this->table_name
                     . ' order by ' . $this->primary_key_name . ' desc limit 1';
 
-            $this->db->prepare($sql);
-
-            $this->db->bindParam(':id', $this->{$this->primary_key_name});
-
-            $results = $this->db->execute();
+            $prepared_statement = $this->db->prepare($sql);
+            $prepared_statement->execute();
+            $results = $prepared_statement->fetchAll();
 
             if (!$results) {
                 return false;
             }
 
-            $row = reset($results);
+            $this->data = reset($results);
 
-            foreach ($row as $key => $value) {
-                $this->data->{$key} = $value;
-            }
             $this->notifyObservers('load');
         } catch (Exception $e) {
             throw new ModelInsertException($this->class_name, 500, $e);
@@ -168,25 +162,20 @@ abstract class Model implements ModelInterface {
 
     public function loadFirst() {
         try {
+
             $sql = 'select *'
                     . ' from ' . $this->db_name . '.' . $this->table_name
                     . ' order by ' . $this->primary_key_name . ' asc limit 1';
 
-            $this->db->prepare($sql);
-
-            $this->db->bindParam(':id', $this->{$this->primary_key_name});
-
-            $results = $this->db->execute();
+            $prepared_statement = $this->db->prepare($sql);
+            $prepared_statement->execute();
+            $results = $prepared_statement->fetchAll();
 
             if (!$results) {
                 return false;
             }
 
-            $row = reset($results);
-
-            foreach ($row as $key => $value) {
-                $this->data->{$key} = $value;
-            }
+            $this->data = reset($results);
 
             $this->notifyObservers('load');
         } catch (Exception $e) {
@@ -194,8 +183,8 @@ abstract class Model implements ModelInterface {
         }
     }
 
-    public function execute() {
-        $this->db->execute();
+    public function getData() {
+        return $this->data;
     }
 
 }
@@ -220,7 +209,7 @@ class ModelObserver implements ModelObserverInterface {
     public function update($model, $subject, $data) {
         echo 'MODEL: ' . $model . PHP_EOL;
         echo 'SUBJECT: ' . $subject . PHP_EOL;
-        echo json_encode($data) . PHP_EOL;
+        var_dump($data);
     }
 
 }

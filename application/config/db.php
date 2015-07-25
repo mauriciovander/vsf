@@ -8,6 +8,6 @@ abstract class DB {
     const PORT = 3306;
     const USER = 'root';
     const PASSWORD = 'root';
-    const DATABASE = 'testdb';
+    const DATABASE = 'vsf';
 
 }

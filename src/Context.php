@@ -2,6 +2,8 @@
 
 namespace vsf;
 
+use application\config\URL as config;
+
 class Context {
 
     const API = 1;
@@ -12,24 +14,29 @@ class Context {
     public function getContext() {
         if ($this->isAjax()) {
             return self::AJAX;
+        } else if ($this->isSite()) {
+            return self::SITE;
         } else if ($this->isApi()) {
             return self::API;
         } else if ($this->isCli()) {
             return self::CLI;
-        } else {
-            return self::SITE;
         }
     }
 
     private function isAjax() {
-        $http_x_req_with_filter = \filter_input(INPUT_SERVER, HTTP_X_REQUESTED_WITH);
+        $http_x_req_with_filter = \filter_input(INPUT_SERVER, 'HTTP_X_REQUESTED_WITH');
         $http_x_req_with = \strtolower($http_x_req_with_filter);
         return !empty($http_x_req_with) && $http_x_req_with == 'xmlhttprequest';
     }
 
     private function isApi() {
         $host = \filter_input(INPUT_SERVER, 'HTTP_HOST');
-        return \strpos($host, 'local.api') === 0;
+        return \strpos($host, config::API) !== false;
+    }
+
+    private function isSite() {
+        $host = \filter_input(INPUT_SERVER, 'HTTP_HOST');
+        return (\strpos($host, config::SITE) === 0);
     }
 
     private function isCli() {

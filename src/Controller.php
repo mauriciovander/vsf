@@ -10,7 +10,7 @@ abstract class Controller {
     public function __construct(\stdClass $params = null, ResponseFactory $response = null) {
         $this->params = $params;
         $this->response = $response;
-    }
+            }
 
 }
 

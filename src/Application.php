@@ -32,6 +32,7 @@ class Application {
 
     private function setParamsFromContext($argv) {
         $this->params = new \stdClass();
+
         switch ($this->context) {
             case Context::CLI:
                 $n = 0;
@@ -49,7 +50,7 @@ class Application {
                     $this->params->{$param} = filter_input(INPUT_POST, $key);
                 }
                 break;
-            case Context::CLI:
+            case Context::SITE:
                 $rt = filter_input(INPUT_GET, 'rt');
                 $n = 0;
                 foreach (explode('/', $rt) as $param) {
