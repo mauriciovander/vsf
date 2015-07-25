@@ -1,6 +1,7 @@
 <?php
 
 namespace vsf;
+use application\config\Application as config;
 
 interface RouteInterface {
 
@@ -37,11 +38,11 @@ class CliRoute extends Route implements RouteInterface {
     }
 
     public function getController() {
-        return $this->controller;
+        return empty($this->controller)?config::DEFAULT_CLI_CONTROLLER:$this->controller;
     }
 
     public function getAction() {
-        return $this->action;
+        return empty($this->action)?config::DEFAULT_CLI_ACTION:$this->action;
     }
 
     public function getParams() {
@@ -67,11 +68,11 @@ class AjaxRoute extends Route implements RouteInterface {
     }
 
     public function getController() {
-        return $this->controller;
+        return empty($this->controller)?config::DEFAULT_AJAX_CONTROLLER:$this->controller;
     }
 
     public function getAction() {
-        return$this->action;
+        return empty($this->action)?config::DEFAULT_AJAX_ACTION:$this->action;
     }
 
     public function getParams() {
@@ -100,11 +101,11 @@ class SiteRoute extends Route implements RouteInterface {
     }
 
     public function getController() {
-        return $this->controller;
+        return empty($this->controller)?config::DEFAULT_SITE_CONTROLLER:$this->controller;
     }
 
     public function getAction() {
-        return$this->action;
+        return empty($this->action)?config::DEFAULT_SITE_ACTION:$this->action;
     }
 
     public function getParams() {
@@ -130,11 +131,11 @@ class ApiRoute extends Route implements RouteInterface {
     }
 
     public function getController() {
-        return $this->controller;
+        return empty($this->controller)?config::DEFAULT_API_CONTROLLER:$this->controller;
     }
 
     public function getAction() {
-        return$this->action;
+        return empty($this->action)?config::DEFAULT_API_ACTION:$this->action;
     }
 
     public function getParams() {

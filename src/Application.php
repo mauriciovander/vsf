@@ -12,9 +12,22 @@ class Application {
 
 // response_factory could be ApiResponseFactory or AjaxResponseFactory
     public function __construct($context, $argv = null) {
+        $this->registerErrorHandlers();
         $this->context = $context;
         $this->init($argv);
         $this->run();
+    }
+
+    public function undefinedMethodErrorHandler() {
+        $error = error_get_last();
+        if (!is_null($error)) {
+            if(strpos($error['message'], 'Call to undefined method')===0)
+                echo $this->response->error('Invalid method',$this->route);
+        }
+    }
+
+    private function registerErrorHandlers() {
+        register_shutdown_function(array(self, 'undefinedMethodErrorHandler'));
     }
 
     private function init($argv) {
@@ -69,7 +82,7 @@ class Application {
         $controller_name = ucwords($this->route->getController());
         $controller_class = 'application\\controllers\\' . $controller_name . 'Controller';
         try {
-            
+
             $this->controller = new $controller_class($this->params, $this->response);
         } catch (Exception $e) {
             throw new ControllerNotFoundException($controller_name, 400, $e);
@@ -82,4 +95,3 @@ class Application {
     }
 
 }
-
