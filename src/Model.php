@@ -111,17 +111,82 @@ abstract class Model implements ModelInterface {
         }
     }
 
-    public function load() {
+    public function load($id) {
         try {
             $sql = 'select *'
                     . ' from ' . $this->db_name . '.' . $this->table_name
-                    . ' where ' . $this->primary_key_name . '=:id';
+                    . ' where ' . $this->primary_key_name . '=:id limit 1';
+
+            $this->db->prepare($sql);
+
+            $this->db->bindParam(':id', $id);
+
+            $results = $this->db->execute();
+
+            if (!$results) {
+                return false;
+            }
+
+            $row = reset($results);
+
+            foreach ($row as $key => $value) {
+                $this->data->{$key} = $value;
+            }
+
+            $this->notifyObservers('load');
+        } catch (Exception $e) {
+            throw new ModelInsertException($this->class_name, 500, $e);
+        }
+    }
+
+    public function loadLast() {
+        try {
+            $sql = 'select *'
+                    . ' from ' . $this->db_name . '.' . $this->table_name
+                    . ' order by ' . $this->primary_key_name . ' desc limit 1';
 
             $this->db->prepare($sql);
 
             $this->db->bindParam(':id', $this->{$this->primary_key_name});
 
-            $this->db->execute();
+            $results = $this->db->execute();
+
+            if (!$results) {
+                return false;
+            }
+
+            $row = reset($results);
+
+            foreach ($row as $key => $value) {
+                $this->data->{$key} = $value;
+            }
+            $this->notifyObservers('load');
+        } catch (Exception $e) {
+            throw new ModelInsertException($this->class_name, 500, $e);
+        }
+    }
+
+    public function loadFirst() {
+        try {
+            $sql = 'select *'
+                    . ' from ' . $this->db_name . '.' . $this->table_name
+                    . ' order by ' . $this->primary_key_name . ' asc limit 1';
+
+            $this->db->prepare($sql);
+
+            $this->db->bindParam(':id', $this->{$this->primary_key_name});
+
+            $results = $this->db->execute();
+
+            if (!$results) {
+                return false;
+            }
+
+            $row = reset($results);
+
+            foreach ($row as $key => $value) {
+                $this->data->{$key} = $value;
+            }
 
             $this->notifyObservers('load');
         } catch (Exception $e) {

@@ -10,6 +10,9 @@ class IndexController extends \vsf\Controller {
         $observer = new \vsf\ModelObserver();
         $test->addObserver($observer);
         
+        $test->loadFirst();
+        
+        
         echo $this->response->success('SUCCESS', $this->params);
     }
 
