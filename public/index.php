@@ -7,7 +7,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-// Some usefull constants definnitions:
+// Some useful constants definnitions:
 define('BASEPATH',  realpath(__DIR__.'/..'));
 define('UUID', uniqid(true));
 
