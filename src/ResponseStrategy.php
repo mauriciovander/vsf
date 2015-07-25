@@ -1,6 +1,6 @@
 <?php
 
-namespace Vsf;
+namespace vsf;
 
 // Abstract Product:
 // JSON response
@@ -23,14 +23,14 @@ interface ResponseFactory {
 
 // Concrete Factory:
 // Response for APIcontext
-class ApiResponse implements \Vsf\ResponseFactory {
+class ApiResponse implements ResponseFactory {
 
     public function error($message = null, $data = null) {
-        return new \Vsf\ApiErrorResponse($message, $data);
+        return new ApiErrorResponse($message, $data);
     }
 
     public function success($message = null, $data = null) {
-        return new \Vsf\ApiSuccessResponse($message, $data);
+        return new ApiSuccessResponse($message, $data);
     }
 
     public function setHeaders() {
@@ -43,14 +43,14 @@ class ApiResponse implements \Vsf\ResponseFactory {
 
 // Concrete Factory
 // Response for AJAX context
-class AjaxResponse implements \Vsf\ResponseFactory {
+class AjaxResponse implements ResponseFactory {
 
     public function error($message = null, $data = null) {
-        return new \Vsf\AjaxErrorResponse($message, $data);
+        return new AjaxErrorResponse($message, $data);
     }
 
     public function success($message = null, $data = null) {
-        return new \Vsf\AjaxSuccessResponse($message, $data);
+        return new AjaxSuccessResponse($message, $data);
     }
 
     public function setHeaders() {
@@ -63,14 +63,14 @@ class AjaxResponse implements \Vsf\ResponseFactory {
 
 // Concrete Factory
 // Response for AJAX context
-class SiteResponse implements \Vsf\ResponseFactory {
+class SiteResponse implements ResponseFactory {
 
     public function error($message = null, $data = null) {
-        return new \Vsf\SiteErrorResponse($message, $data);
+        return new SiteErrorResponse($message, $data);
     }
 
     public function success($message = null, $data = null) {
-        return new \Vsf\SiteSuccessResponse($message, $data);
+        return new SiteSuccessResponse($message, $data);
     }
 
     public function setHeaders() {
@@ -86,14 +86,14 @@ class SiteResponse implements \Vsf\ResponseFactory {
 
 // Concrete Factory
 // Response for AJAX context
-class CliResponse implements \Vsf\ResponseFactory {
+class CliResponse implements ResponseFactory {
 
     public function error($message = null, $data = null) {
-        return new \Vsf\CliErrorResponse($message, $data);
+        return new CliErrorResponse($message, $data);
     }
 
     public function success($message = null, $data = null) {
-        return new \Vsf\CliSuccessResponse($message, $data);
+        return new CliSuccessResponse($message, $data);
     }
 
     public function setHeaders() {
@@ -130,7 +130,7 @@ abstract class JsonResponse {
 
 }
 
-class JsonSuccessResponse extends \Vsf\JsonResponse {
+class JsonSuccessResponse extends JsonResponse {
 
     public function __construct($message = null, $data = null) {
         parent::__construct($message, $data);
@@ -139,7 +139,7 @@ class JsonSuccessResponse extends \Vsf\JsonResponse {
 
 }
 
-class JsonErrorResponse extends \Vsf\JsonResponse {
+class JsonErrorResponse extends JsonResponse {
 
     public function __construct($message = null, $data = null) {
         parent::__construct($message, $data);
@@ -150,49 +150,49 @@ class JsonErrorResponse extends \Vsf\JsonResponse {
 
 // Concrete Product:
 // Error response for API context
-class ApiErrorResponse extends \Vsf\JsonErrorResponse implements Response {
+class ApiErrorResponse extends JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for API context
-class ApiSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
+class ApiSuccessResponse extends JsonSuccessResponse implements Response {
     
 }
 
 // Concrete Product:
 // Error response for AJAX context
-class AjaxErrorResponse extends \Vsf\JsonErrorResponse implements Response {
+class AjaxErrorResponse extends JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for AJAX context
-class AjaxSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
+class AjaxSuccessResponse extends JsonSuccessResponse implements Response {
     
 }
 
 // Concrete Product:
 // Error response for AJAX context
-class SiteErrorResponse extends \Vsf\JsonErrorResponse implements Response {
+class SiteErrorResponse extends JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for AJAX context
-class SiteSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
+class SiteSuccessResponse extends JsonSuccessResponse implements Response {
     
 }
 
 // Concrete Product:
 // Error response for CLI context
-class CliErrorResponse extends \Vsf\JsonErrorResponse implements Response {
+class CliErrorResponse extends JsonErrorResponse implements Response {
     
 }
 
 // Concrete Product:
 // Successful response for CLI context
-class CliSuccessResponse extends \Vsf\JsonSuccessResponse implements Response {
+class CliSuccessResponse extends JsonSuccessResponse implements Response {
     
 }
 
@@ -210,16 +210,16 @@ class ResponseStrategy {
     private function selectResponseStrategyFromContext($cliArguments) {
         switch ($this->context) {
             case Context::AJAX:
-                $this->response_strategy = new \Vsf\AjaxResponse;
+                $this->response_strategy = new AjaxResponse;
                 break;
             case Context::API:
-                $this->response_strategy = new \Vsf\ApiResponse;
+                $this->response_strategy = new ApiResponse;
                 break;
             case Context::CLI:
-                $this->response_strategy = new \Vsf\CliResponse($cliArguments);
+                $this->response_strategy = new CliResponse($cliArguments);
                 break;
             case Context::SITE:
-                $this->response_strategy = new \Vsf\SiteResponse;
+                $this->response_strategy = new SiteResponse;
                 break;
         }
     }

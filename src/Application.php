@@ -1,6 +1,6 @@
 <?php
 
-namespace Vsf;
+namespace vsf;
 
 class Application {
 
@@ -25,7 +25,7 @@ class Application {
     }
 
     private function selectResponseFromContext() {
-        $response_strategy = new \Vsf\ResponseStrategy($this->context);
+        $response_strategy = new ResponseStrategy($this->context);
         $this->response = $response_strategy->getResponse();
         $this->response->setHeaders();
     }
@@ -33,23 +33,23 @@ class Application {
     private function setParamsFromContext($argv) {
         $this->params = new \stdClass();
         switch ($this->context) {
-            case \Vsf\Context::CLI:
+            case Context::CLI:
                 $n = 0;
                 foreach ($argv as $param) {
                     $this->params->{'p' . $n++} = $param;
                 }
                 break;
-            case \Vsf\Context::API:
+            case Context::API:
                 foreach (array_keys($_POST) as $param) {
                     $this->params->{$param} = filter_input(INPUT_POST, $key);
                 }
                 break;
-            case \Vsf\Context::AJAX:
+            case Context::AJAX:
                 foreach (array_keys($_POST) as $param) {
                     $this->params->{$param} = filter_input(INPUT_POST, $key);
                 }
                 break;
-            case \Vsf\Context::CLI:
+            case Context::CLI:
                 $rt = filter_input(INPUT_GET, 'rt');
                 $n = 0;
                 foreach (explode('/', $rt) as $param) {
@@ -60,17 +60,18 @@ class Application {
     }
 
     private function setRouteFromContext($argv) {
-        $route_strategy = new \Vsf\RouteStrategy($this->context, $argv);
+        $route_strategy = new RouteStrategy($this->context, $argv);
         $this->route = $route_strategy->getRoute();
     }
 
     public function loadControllerFile() {
         $controller_name = ucwords($this->route->getController());
-        $controller_class = '\\application\\controllers\\' . $controller_name . 'Controller';
+        $controller_class = 'application\\controllers\\' . $controller_name . 'Controller';
         try {
+            
             $this->controller = new $controller_class($this->params, $this->response);
         } catch (Exception $e) {
-            throw new \Vsf\ControllerNotFoundException($controller_name, 400, $e);
+            throw new ControllerNotFoundException($controller_name, 400, $e);
         }
     }
 
@@ -80,3 +81,4 @@ class Application {
     }
 
 }
+

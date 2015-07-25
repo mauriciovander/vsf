@@ -1,5 +1,5 @@
 {
-    "name": "mauriciovander/Vsf",
+    "name": "mauriciovander/vsf",
     "description": "Very Simple Framework",
     "authors": [
         {
@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Vsf\\": "src/",
+            "vsf\\": "src/",
             "application\\": "application/",
             "application\\controllers\\": "application/controllers/",
             "application\\views\\": "application/views/",

@@ -8,7 +8,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$context = new Vsf\Context();
+$context = new \vsf\Context();
 
 if ($argc) {
     $params = $argv;
@@ -16,4 +16,4 @@ if ($argc) {
     $params = array();
 }
 
-$app = new Vsf\Application($context->getContext(), $params);
+$app = new \vsf\Application($context->getContext(), $params);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Vsf;
+namespace vsf;
 
 interface RouteInterface {
 
@@ -9,23 +9,16 @@ interface RouteInterface {
     public function getAction();
 
     public function getParams();
-
-    public function validateAndLoad();
 }
 
 abstract class Route {
-
     private $controller;
     private $action;
     private $params;
 
-    public function validateAndLoad() {
-        
-    }
-
 }
 
-class CliRoute extends Route implements \Vsf\RouteInterface {
+class CliRoute extends Route implements RouteInterface {
 
     public function __construct($argv) {
         \array_shift($argv);
@@ -57,7 +50,7 @@ class CliRoute extends Route implements \Vsf\RouteInterface {
 
 }
 
-class AjaxRoute extends Route implements \Vsf\RouteInterface {
+class AjaxRoute extends Route implements RouteInterface {
 
     public function __construct() {
         $rt = \filter_input(\INPUT_GET, 'rt');
@@ -87,7 +80,7 @@ class AjaxRoute extends Route implements \Vsf\RouteInterface {
 
 }
 
-class SiteRoute extends Route implements \Vsf\RouteInterface {
+class SiteRoute extends Route implements RouteInterface {
 
     public function __construct() {
         $rt = \filter_input(\INPUT_GET, 'rt');
@@ -120,7 +113,7 @@ class SiteRoute extends Route implements \Vsf\RouteInterface {
 
 }
 
-class ApiRoute extends Route implements \Vsf\RouteInterface {
+class ApiRoute extends Route implements RouteInterface {
 
     public function __construct() {
         $rt = \filter_input(\INPUT_GET, 'rt');
@@ -163,16 +156,16 @@ class RouteStrategy {
     private function selectRouteStrategyFromContext($argv) {
         switch ($this->context) {
             case Context::AJAX:
-                $this->route_strategy = new \Vsf\AjaxRoute;
+                $this->route_strategy = new AjaxRoute;
                 break;
             case Context::API:
-                $this->route_strategy = new \Vsf\ApiRoute;
+                $this->route_strategy = new ApiRoute;
                 break;
             case Context::CLI:
-                $this->route_strategy = new \Vsf\CliRoute($argv);
+                $this->route_strategy = new CliRoute($argv);
                 break;
             case Context::SITE:
-                $this->route_strategy = new \Vsf\SiteRoute;
+                $this->route_strategy = new SiteRoute;
                 break;
         }
     }
