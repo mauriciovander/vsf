@@ -11,7 +11,7 @@ namespace vsf;
 // JSON response
 interface Response {
 
-    public function __construct($message = null, $data = null);
+    public function __construct($message = null, $data = null, $template = null);
 
     public function __toString();
 }
@@ -24,11 +24,15 @@ interface ResponseFactory {
     public function success($message = null, $data = null);
 
     public function setHeaders();
+
+    public function setTemplate($template);
 }
 
 // Concrete Factory:
 // Response for APIcontext
 class ApiResponse implements ResponseFactory {
+
+    private $template;
 
     public function error($message = null, $data = null) {
         return new ApiErrorResponse($message, $data);
@@ -44,18 +48,24 @@ class ApiResponse implements ResponseFactory {
         header('Content-type: application/json; charset=utf-8');
     }
 
+    public function setTemplate($template) {
+        $this->template = $template;
+    }
+
 }
 
 // Concrete Factory
 // Response for AJAX context
 class AjaxResponse implements ResponseFactory {
 
+    private $template;
+
     public function error($message = null, $data = null) {
-        return new AjaxErrorResponse($message, $data);
+        return new AjaxErrorResponse($message, $data, $this->template);
     }
 
     public function success($message = null, $data = null) {
-        return new AjaxSuccessResponse($message, $data);
+        return new AjaxSuccessResponse($message, $data, $this->template);
     }
 
     public function setHeaders() {
@@ -64,18 +74,24 @@ class AjaxResponse implements ResponseFactory {
         header('Content-type: application/json; charset=utf-8');
     }
 
+    public function setTemplate($template) {
+        $this->template = $template;
+    }
+
 }
 
 // Concrete Factory
 // Response for AJAX context
 class SiteResponse implements ResponseFactory {
 
+    private $template;
+
     public function error($view = null, $data = null) {
-        return new SiteErrorResponse($view, $data);
+        return new SiteErrorResponse($view, $data, $this->template);
     }
 
     public function success($view = null, $data = null) {
-        return new SiteSuccessResponse($view, $data);
+        return new SiteSuccessResponse($view, $data, $this->template);
     }
 
     public function setHeaders() {
@@ -87,22 +103,32 @@ class SiteResponse implements ResponseFactory {
         header('Content-type: text/html');
     }
 
+    public function setTemplate($template) {
+        $this->template = $template;
+    }
+
 }
 
 // Concrete Factory
 // Response for AJAX context
 class CliResponse implements ResponseFactory {
 
+    private $template;
+
     public function error($message = null, $data = null) {
-        return new CliErrorResponse($message, $data);
+        return new CliErrorResponse($message, $data, $this->template);
     }
 
     public function success($message = null, $data = null) {
-        return new CliSuccessResponse($message, $data);
+        return new CliSuccessResponse($message, $data, $this->template);
     }
 
     public function setHeaders() {
 // NOOP
+    }
+
+    public function setTemplate($template) {
+        $this->template = $template;
     }
 
 }
@@ -112,9 +138,11 @@ abstract class JsonResponse {
     protected $result;
     protected $message;
     protected $data;
+    protected $template;
 
-    public function __construct($message = null, $data = null) {
+    public function __construct($message = null, $data = null, $template = null) {
         $this->message = $message;
+        $this->template = $template;
         $this->data = $data;
         $this->result = null;
     }
@@ -137,8 +165,8 @@ abstract class JsonResponse {
 
 class JsonSuccessResponse extends JsonResponse {
 
-    public function __construct($message = null, $data = null) {
-        parent::__construct($message, $data);
+    public function __construct($message = null, $data = null, $template = null) {
+        parent::__construct($message, $data, $template);
         $this->result = 'success';
     }
 
@@ -146,8 +174,8 @@ class JsonSuccessResponse extends JsonResponse {
 
 class JsonErrorResponse extends JsonResponse {
 
-    public function __construct($message = null, $data = null) {
-        parent::__construct($message, $data);
+    public function __construct($message = null, $data = null, $template = null) {
+        parent::__construct($message, $data, $template);
         $this->result = 'error';
     }
 
@@ -181,19 +209,26 @@ class AjaxSuccessResponse extends JsonSuccessResponse implements Response {
 // Error response for Site context
 class SiteErrorResponse implements Response {
 
-    private $view_file;
+    private $message;
     private $data;
+    private $template;
 
-    public function __construct($view = null, $data = null) {
+    public function __construct($message = null, $data = null, $template = null) {
         $this->data = $data;
-        $this->view_file = $view;
+        $this->mmessage = $message;
+        $this->template = $template;
     }
 
     public function __toString() {
-        foreach ($this->data as $key => $value) {
-            $$key = $value;
+        if (!is_null($this->template)) {
+            $message = $this->message;
+            foreach ($this->data as $key => $value) {
+                $$key = $value;
+            }
+            include BASEPATH . '/application/views/' . $this->template;
+        } else {
+            var_dump($this->data);
         }
-        include BASEPATH . '/application/views/' . $this->view_file;
         return '';
     }
 
@@ -203,19 +238,27 @@ class SiteErrorResponse implements Response {
 // Successful response for Site context
 class SiteSuccessResponse implements Response {
 
-    private $view_file;
+    private $message;
     private $data;
+    private $template;
 
-    public function __construct($view = null, $data = null) {
+    public function __construct($message = null, $data = null, $template = null) {
         $this->data = $data;
-        $this->view_file = $view;
+        $this->message = $message;
+        $this->template = $template;
     }
 
     public function __toString() {
-        foreach ($this->data as $key => $value) {
-            $$key = $value;
+        if (!is_null($this->template)) {
+            $message = $this->message;
+            foreach ($this->data as $key => $value) {
+                $$key = $value;
+            }
+            include BASEPATH . '/application/views/' . $this->template;
+        } else {
+            echo $this->message;
+            var_dump($this->data);
         }
-        include BASEPATH . '/application/views/' . $this->view_file;
         return '';
     }
 

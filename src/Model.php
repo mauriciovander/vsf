@@ -38,6 +38,7 @@ abstract class Model implements ModelInterface {
      * set a field value in $this->data
      * @example $model->field_name = 'field_value';
      */
+
     public function __set($name, $value) {
         $this->data[$name] = $value;
     }
@@ -46,6 +47,7 @@ abstract class Model implements ModelInterface {
      * get a field value from $this->data
      * @example $field_value = $model->field_name;
      */
+
     public function __get($name) {
         return $this->data[$name];
     }
@@ -149,7 +151,7 @@ abstract class Model implements ModelInterface {
             if ($prepared_statement->execute()) {
                 $this->load($this->db->lastInsertId());
             }
-            
+
             $this->notifyObservers('create');
         } catch (Exception $e) {
             throw new ModelInsertException($this->class_name, 500, $e);
@@ -271,13 +273,11 @@ interface ModelObserverInterface {
     public function update($model, $subject, $data);
 }
 
-
 class ModelObserver implements ModelObserverInterface {
 
     public function update($model, $subject, $data) {
-        echo 'MODEL: ' . $model . PHP_EOL;
-        echo 'SUBJECT: ' . $subject . PHP_EOL;
-        var_dump($data);
+        $log = new \Monolog\Logger($model);
+        $log->addNotice($subject,$data);
     }
 
 }

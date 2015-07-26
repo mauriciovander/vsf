@@ -18,18 +18,19 @@ class IndexController extends \vsf\Controller {
         $test->create();
 
         $test->loadFirst();
-
-        echo $this->response->success('index.php', array(
-            'model'=>$test->getData(),
-            'input'=>$this->params));
+        $this->response->setTemplate('index.php');
+        
+        echo $this->response->success('success', array(
+            'model' => $test->getData(),
+            'input' => $this->params));
     }
 
     public function testSuccess() {
-        echo $this->response->success('index.php', $this->params);
+        echo $this->response->success('SUCCESS', $this->params);
     }
 
     public function testError() {
-        echo $this->response->error('index.php', $this->params);
+        echo $this->response->error('ERROR', $this->params);
     }
 
 }

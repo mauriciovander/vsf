@@ -9,6 +9,8 @@ namespace application\config;
 
 abstract class Application {
 
+    const NAME = 'Very Simple Framework';
+    
     /**
      * SITE default route
      */
