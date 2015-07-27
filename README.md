@@ -56,3 +56,21 @@ Token is stored as a cookie and is related to client information
 
 Context: SITE
 http://www.domain.com/controller/action/param1/param2...
+
+
+Tests:
+
+- install phpunit
+ wget https://phar.phpunit.de/phpunit.phar
+
+➜ chmod +x phpunit.phar
+
+➜ sudo mv phpunit.phar /usr/local/bin/phpunit
+
+➜ phpunit --version
+
+
+
+Run Test:
+
+    phpunit --bootstrap vendor/autoload.php tests/test-model-test.php 
