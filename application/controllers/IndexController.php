@@ -17,7 +17,7 @@ class IndexController extends \vsf\Controller {
 
         $test->create();
 
-        $test->loadFirst();
+//        $test->loadFirst();
         $this->response->setTemplate('index.php');
         
         echo $this->response->success('success', array(
