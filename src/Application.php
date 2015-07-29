@@ -30,14 +30,12 @@ class Application {
     }
 
     private function selectResponseFromContext() {
-        $response_strategy = new ResponseStrategy($this->context);
-        $this->response = $response_strategy->getResponse();
+        $this->response = response\ResponseFactory::create($this->context);
         $this->response->setHeaders();
     }
 
     private function setRouteFromContext($argv) {
-        $route_strategy = new RouteStrategy($this->context, $argv);
-        $this->route = $route_strategy->getRoute();
+        $this->route = route\RouteFactory::create($this->context, $argv);
     }
 
     private function setParams() {
@@ -48,7 +46,6 @@ class Application {
         $controller_name = ucwords($this->route->getController());
         $controller_class = 'application\\controllers\\' . $controller_name . 'Controller';
         try {
-
             $this->controller = new $controller_class($this->params, $this->response);
         } catch (Exception $e) {
             throw new ControllerNotFoundException($controller_name, 400, $e);

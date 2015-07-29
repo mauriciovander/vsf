@@ -18,7 +18,7 @@ class TestModelTest extends PHPUnit_Framework_TestCase {
         $c->create();
         
         $this->assertLessThan(intval($c->id_test), intval($b->id_test));
-        
+                
     }
 
 }

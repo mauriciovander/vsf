@@ -11,10 +11,10 @@ use application\config\URL as config;
 
 class Context {
 
-    const API = 1;
-    const AJAX = 2;
-    const SITE = 3;
-    const CLI = 4;
+    const API = 'Api';
+    const AJAX = 'Ajax';
+    const SITE = 'Site';
+    const CLI = 'Cli';
 
     public function getContext() {
         if ($this->isAjax()) {
