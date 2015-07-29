@@ -57,7 +57,7 @@ abstract class Model implements ModelInterface {
      * @example $model->addObserver(new ModelObserver());
      * @param \vsf\ModelObserverInterface $observer
      */
-    public function addObserver(ModelObserverInterface $observer) {
+    public function addObserver(observer\ObserverInterface $observer) {
         $this->observers[] = $observer;
     }
 
@@ -261,34 +261,14 @@ interface ModelInterface {
 }
 
 /**
- *  Model Observer Interface
- */
-interface ModelObserverInterface {
-
-    /**
-     * @param string $model
-     * @param string $subject
-     * @param mixed $data
-     */
-    public function update($model, $subject, $data);
-}
-
-class ModelObserver implements ModelObserverInterface {
-
-    public function update($model, $subject, $data) {
-        $log = new \Monolog\Logger($model);
-        $log->addNotice($subject,$data);
-    }
-
-}
-
-/**
  *  Model Exceptions
  */
 abstract class ModelException extends \Exception {
 
     public function __construct($message = '', $code = null, $previous = null) {
         parent::__construct('MODEL | ' . $message, $code, $previous);
+        $log = new \Monolog\Logger('Model');
+        $log->addError($message);
     }
 
 }

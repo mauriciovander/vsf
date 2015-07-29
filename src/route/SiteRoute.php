@@ -22,7 +22,10 @@ class SiteRoute extends Route implements RouteInterface {
         $p = 0;
         if (!is_null($route)) {
             foreach ($route as $param) {
-                $this->params->{'p' . $p++} = \filter_var($param, \FILTER_SANITIZE_ENCODED);
+                $value = \filter_var($param, \FILTER_SANITIZE_ENCODED);
+                if (!empty($value)) {
+                    $this->params->{'p' . $p++} = $value;
+                }
             }
         }
     }

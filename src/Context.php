@@ -9,6 +9,13 @@ namespace vsf;
 
 use application\config\URL as config;
 
+/**
+ * For each new context definition included in this class, 
+ * new RouteInterface and ResponseInterface must be added 
+ * in route and response folders respectively 
+ * Example: a new FileResponse could be added to the options and a 
+ * mixed context should be implemented... 
+ */
 class Context {
 
     const API = 'Api';
@@ -17,14 +24,20 @@ class Context {
     const CLI = 'Cli';
 
     public function getContext() {
-        if ($this->isAjax()) {
-            return self::AJAX;
-        } else if ($this->isSite()) {
-            return self::SITE;
-        } else if ($this->isApi()) {
-            return self::API;
-        } else if ($this->isCli()) {
-            return self::CLI;
+        try {
+            if ($this->isAjax()) {
+                return self::AJAX;
+            } else if ($this->isSite()) {
+                return self::SITE;
+            } else if ($this->isApi()) {
+                return self::API;
+            } else if ($this->isCli()) {
+                return self::CLI;
+            }
+            throw new UnknownContextException;
+        } catch (UnknownContextException $e) {
+            var_dump($e->getTrace());
+            exit;
         }
     }
 
@@ -46,6 +59,19 @@ class Context {
 
     private function isCli() {
         return \php_sapi_name() == "cli";
+    }
+
+}
+
+/**
+ * Context Exception
+ */
+class UnknownContextException extends \Exception {
+
+    public function __construct($message = null, $code = 500, Exception $previous = null) {
+        parent::__construct($message, $code, $previous);
+        $log = new \Monolog\Logger('Context');
+        $log->addError('Unknown context');
     }
 
 }

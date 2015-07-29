@@ -12,7 +12,7 @@ class IndexController extends \vsf\Controller {
     public function index() {
 
         $test = new \application\models\Test();
-        $observer = new \vsf\ModelObserver();
+        $observer = new \vsf\observer\ModelObserver();
         $test->addObserver($observer);
 
         $test->create();

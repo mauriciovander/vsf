@@ -43,6 +43,13 @@
             <div class="starter-template">
 
                 <h1>Input parameters</h1>
+                <p>Input parameters in Site Context are parsed from URL<br/>
+                    <?php
+                    $host = filter_input(INPUT_SERVER, 'HTTP_HOST');
+                    $protocol = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://';
+                    ?>
+                    <a href="<?php echo $protocol . $host; ?>"><?php echo $protocol . $host; ?>/<span>controller</span>/<span>action</span>/param1/param2/...</a>
+                </p>
                 <pre><?php var_dump($input); ?></pre>
 
                 <h1>Model Data</h1>
