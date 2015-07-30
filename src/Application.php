@@ -14,6 +14,7 @@ class Application {
     private $route;
     private $params;
     private $controller;
+    private $action_config;
 
 // response_factory could be ApiResponseFactory or AjaxResponseFactory
     public function __construct($context, $argv = null) {
@@ -27,6 +28,7 @@ class Application {
         $this->setRouteFromContext($argv);
         $this->setParams();
         $this->loadControllerFile();
+        $this->loadActionConfig();
     }
 
     private function selectResponseFromContext() {
@@ -42,7 +44,24 @@ class Application {
         $this->params = $this->route->getParams();
     }
 
-    public function loadControllerFile() {
+    private function loadActionConfig() {
+        $endpoint_name = '\\application\\endpoints\\'
+                . $this->route->getController()
+                . '\\'
+                . $this->route->getAction();
+
+        if (class_exists($endpoint_name)) {
+            $endpoint = new $endpoint_name ();
+            foreach ($endpoint->getValidators() as $validator) {
+                $this->controller->addValidator(new $validator());
+            }
+        } else {
+            $log = new \Monolog\Logger('Config');
+            $log->addWarning('No configuration found for endpoint', array($endpoint_name,$this->context));
+        }
+    }
+
+    private function loadControllerFile() {
         $controller_name = ucwords($this->route->getController());
         $controller_class = 'application\\controllers\\' . $controller_name . 'Controller';
         try {
@@ -53,8 +72,10 @@ class Application {
     }
 
     public function run() {
-        $method_name = $this->route->getAction();
-        $this->controller->$method_name();
+        if ($this->controller->runValidators()) {
+            $method_name = $this->route->getAction();
+            $this->controller->$method_name();
+        }
     }
 
 }

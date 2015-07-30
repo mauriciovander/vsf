@@ -58,7 +58,10 @@ class SiteErrorResponse implements Response {
             }
             include BASEPATH . '/application/views/' . $this->template;
         } else {
-            var_dump($this->data);
+            $result = new \stdClass();
+            $result->message = $this->message;
+            $result->data = $this->data;
+            return json_encode($result);
         }
         return '';
     }

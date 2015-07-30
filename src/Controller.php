@@ -7,6 +7,9 @@
 
 namespace vsf;
 
+use vsf\validators\ValidatorInterface as ValidatorInterface;
+use vsf\observer\ObserverInterface as ObserverInterface;
+
 /**
  * Basic controller class
  * @param stdClass $params
@@ -16,10 +19,36 @@ abstract class Controller {
 
     protected $response;
     protected $params;
+    protected $observers;
+    protected $validators;
 
     public function __construct(\stdClass $params = null, response\ResponseInterface $response = null) {
         $this->params = $params;
         $this->response = $response;
+        $this->observers = [];
+        $this->validators = [];
+    }
+
+    public function addObserver(ObserverInterface $observer) {
+        $this->observers[] = $observer;
+    }
+
+    public function addValidator(ValidatorInterface $validator) {
+        $this->validators[] = $validator;
+    }
+
+    public function runValidators() {
+        try {
+            foreach ($this->validators as $validator) {
+                if (!$validator->validate($this->params)) {
+                    throw new validators\ValidatorException($validator->getMessage(), 400);
+                }
+            }
+            return true;
+        } catch (validators\ValidatorException $e) {
+            echo $this->response->error($e->getMessage(),$this->params);
+        }
+        return false;
     }
 
 }
