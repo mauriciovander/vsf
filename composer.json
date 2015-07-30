@@ -8,6 +8,7 @@
         }
     ],
     "require": {
+        "php": ">=5.5.0",
         "monolog/monolog": "^1.15",
         "phpunit/phpunit": "4.7.7"
     },
