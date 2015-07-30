@@ -13,7 +13,7 @@ abstract class Secutiry {
      *  echo $token . PHP_EOL;
      * }
      */
-    static function tokenGenerator($number) {        
+    static function tokenGenerator($number) {
         for ($n = 0; $n < $number; $n++) {
             $uuid = array(
                 'time_low' => 0,
@@ -34,10 +34,8 @@ abstract class Secutiry {
                 $uuid['node'][$i] = mt_rand(0, 255);
             }
 
-            yield \sprintf('%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x', $uuid['time_low'], $uuid['time_mid'], $uuid['time_hi'], $uuid['clock_seq_hi'], $uuid['clock_seq_low'], $uuid['node'][0], $uuid['node'][1], $uuid['node'][2], $uuid['node'][3], $uuid['node'][4], $uuid['node'][5]
-            );
+            yield \sprintf('%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x', $uuid['time_low'], $uuid['time_mid'], $uuid['time_hi'], $uuid['clock_seq_hi'], $uuid['clock_seq_low'], $uuid['node'][0], $uuid['node'][1], $uuid['node'][2], $uuid['node'][3], $uuid['node'][4], $uuid['node'][5]);
         }
     }
+
 }
-
-
