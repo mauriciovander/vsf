@@ -19,13 +19,13 @@ class SiteRoute extends Route implements RouteInterface {
         $this->action = \trim(\reset($route));
         \array_shift($route);
         $this->params = new \stdClass();
-        $p = 0;
-        if (!is_null($route)) {
-            foreach ($route as $param) {
-                $value = \filter_var($param, \FILTER_SANITIZE_ENCODED);
-                if (!empty($value)) {
-                    $this->params->{'p' . $p++} = $value;
-                }
+        while (count($route)) {
+            $key = \filter_var(\trim(\reset($route)), \FILTER_SANITIZE_ENCODED);
+            \array_shift($route);
+            $value = \filter_var(\trim(\reset($route)), \FILTER_SANITIZE_ENCODED);
+            \array_shift($route);
+            if (!empty($key) && !empty($value)) {
+                $this->params->{$key} = $value;
             }
         }
     }

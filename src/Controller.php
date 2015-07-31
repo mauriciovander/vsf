@@ -40,7 +40,7 @@ abstract class Controller {
  */
 abstract class ControllerException extends \Exception {
 
-    public function __construct($message = null, $code = 500, Exception $previous = null) {
+    public function __construct($message = null, $code = 500, \Exception $previous = null) {
         parent::__construct($message, $code, $previous);
         die($message);
     }
@@ -53,7 +53,7 @@ abstract class ControllerException extends \Exception {
 
 class ControllerNotFoundException extends ControllerException {
 
-    public function __construct($controller_name = null, $code = 500, Exception $previous = null) {
+    public function __construct($controller_name = null, $code = 500, \ControllerException $previous = null) {
         $message = 'Controller not found: ' . $controller_name;
         parent::__construct($message, $code, $previous);
     }

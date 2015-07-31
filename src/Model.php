@@ -265,7 +265,7 @@ interface ModelInterface {
  */
 abstract class ModelException extends \Exception {
 
-    public function __construct($message = '', $code = null, $previous = null) {
+    public function __construct($message = '', $code = null, \Exception $previous = null) {
         parent::__construct('MODEL | ' . $message, $code, $previous);
         $log = new \Monolog\Logger('Model');
         $log->addError($message);
@@ -275,7 +275,7 @@ abstract class ModelException extends \Exception {
 
 class ModelUpdateException extends ModelException {
 
-    public function __construct($message = '', $code = null, $previous = null) {
+    public function __construct($message = '', $code = null, ModelException $previous = null) {
         parent::__construct('UPDATE | ' . $message, $code, $previous);
     }
 
@@ -283,7 +283,7 @@ class ModelUpdateException extends ModelException {
 
 class ModelInsertException extends ModelException {
 
-    public function __construct($message = '', $code = null, $previous = null) {
+    public function __construct($message = '', $code = null, ModelException $previous = null) {
         parent::__construct('INSERT | ' . $message, $code, $previous);
     }
 
@@ -291,7 +291,7 @@ class ModelInsertException extends ModelException {
 
 class ModelDeleteException extends ModelException {
 
-    public function __construct($message = '', $code = null, $previous = null) {
+    public function __construct($message = '', $code = null, ModelException $previous = null) {
         parent::__construct('DELETE | ' . $message, $code, $previous);
     }
 
@@ -299,7 +299,7 @@ class ModelDeleteException extends ModelException {
 
 class ModelLoadException extends ModelException {
 
-    public function __construct($message = '', $code = null, $previous = null) {
+    public function __construct($message = '', $code = null, ModelException $previous = null) {
         parent::__construct('LOAD | ' . $message, $code, $previous);
     }
 

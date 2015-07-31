@@ -26,8 +26,8 @@ class Application {
         $this->selectResponseFromContext();
         $this->setRouteFromContext($argv);
         $this->setParams();
-        $this->loadControllerFile();
         $this->loadActionConfig();
+        $this->loadControllerFile();
     }
 
     private function selectResponseFromContext() {
@@ -53,6 +53,7 @@ class Application {
             if (class_exists($endpoint_name)) {
                 $endpoint = new $endpoint_name ();
                 $this->checkValidContext($endpoint);
+                $this->checkRequiredParams($endpoint);
                 $this->runValidators($endpoint);
                 $this->addObservers($endpoint);
             } else {
@@ -63,6 +64,8 @@ class Application {
             die($this->response->error('Invalid Context: ' . $this->context));
         } catch (validators\ValidatorException $e) {
             die($this->response->error($e->getMessage(), $this->params));
+        } catch (MissingRequiredParamException $e) {
+            die($this->response->error($e->getMessage(), $this->params));
         }
     }
 
@@ -72,10 +75,20 @@ class Application {
         }
     }
 
+    private function checkRequiredParams(EndpointInterface $endpoint) {
+        $filter_params = \filter_var_array((array) $this->params, $endpoint->getRequiredParams(), true);
+        foreach ($filter_params as $key => $value) {
+            if (is_null($value)) {
+                throw new MissingRequiredParamException('Missing param ' . $key, 400);
+            }
+        }
+        $this->params = (object) $filter_params;
+    }
+
     private function runValidators(EndpointInterface $endpoint) {
         foreach ($endpoint->getValidators() as $validator) {
             if (!($validator instanceof validators\ValidatorInterface)) {
-                throw new validators\ValidatorException('Invalid validator', 400);                
+                throw new validators\ValidatorException('Invalid validator', 400);
             }
             if (!$validator->validate($this->params)) {
                 throw new validators\ValidatorException($validator->getMessage(), 400);
@@ -103,6 +116,26 @@ class Application {
     function run() {
         $method_name = $this->route->getAction();
         $this->controller->$method_name();
+    }
+
+    public function __destruct() {
+        $time = \microtime() - \filter_input(\INPUT_SERVER, 'REQUEST_TIME_FLOAT');
+        $params = [
+            $this->context,
+            $this->route->getController(),
+            $this->route->getAction(),
+            $this->params
+        ];
+        $log = new \Monolog\Logger('Profiling');
+        $log->addInfo('time : ' . number_format($time, 2) . ' sec', $params);
+    }
+
+}
+
+class MissingRequiredParamException extends \Exception {
+
+    public function __construct($message = null, $code = 400, \Exception $previous = null) {
+        parent::__construct($message, $code, $previous);
     }
 
 }

@@ -20,10 +20,13 @@ class CliRoute extends Route implements RouteInterface {
         $this->action = \filter_var($action, \FILTER_SANITIZE_STRING);
         \array_shift($argv);
         $this->params = new \stdClass();
-        $p = 0;
-        if (!is_null($argv)) {
-            foreach ($argv as $param) {
-                $this->params->{'p' . $p++} = \filter_var($param, \FILTER_SANITIZE_ENCODED);
+        while (count($argv)) {
+            $key = \filter_var(\trim(\reset($argv)), \FILTER_SANITIZE_ENCODED);
+            \array_shift($argv);
+            $value = \filter_var(\trim(\reset($argv)), \FILTER_SANITIZE_ENCODED);
+            \array_shift($argv);
+            if (!empty($key) && !empty($value)) {
+                $this->params->{$key} = $value;
             }
         }
     }
