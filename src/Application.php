@@ -14,7 +14,6 @@ class Application {
     private $route;
     private $params;
     private $controller;
-    private $action_config;
 
 // response_factory could be ApiResponseFactory or AjaxResponseFactory
     public function __construct($context, $argv = null) {
@@ -45,23 +44,53 @@ class Application {
     }
 
     private function loadActionConfig() {
-        $endpoint_name = '\\application\\endpoints\\'
-                . $this->route->getController()
-                . '\\'
-                . $this->route->getAction();
+        try {
+            $endpoint_name = '\\application\\endpoints\\'
+                    . $this->route->getController()
+                    . '\\'
+                    . $this->route->getAction();
 
-        if (class_exists($endpoint_name)) {
-            $endpoint = new $endpoint_name ();
-            foreach ($endpoint->getValidators() as $validator) {
-                $this->controller->addValidator(new $validator());
+            if (class_exists($endpoint_name)) {
+                $endpoint = new $endpoint_name ();
+                $this->checkValidContext($endpoint);
+                $this->runValidators($endpoint);
+                $this->addObservers($endpoint);
+            } else {
+                $log = new \Monolog\Logger('Config');
+                $log->addWarning('No configuration found for endpoint', array($endpoint_name, $this->context));
             }
-        } else {
-            $log = new \Monolog\Logger('Config');
-            $log->addWarning('No configuration found for endpoint', array($endpoint_name,$this->context));
+        } catch (UnknownContextException $e) {
+            die($this->response->error('Invalid Context: ' . $this->context));
+        } catch (validators\ValidatorException $e) {
+            die($this->response->error($e->getMessage(), $this->params));
         }
     }
 
-    private function loadControllerFile() {
+    private function checkValidContext(EndpointInterface $endpoint) {
+        if (!in_array($this->context, $endpoint->getValidContexts())) {
+            throw new UnknownContextException($this->context, 400);
+        }
+    }
+
+    private function runValidators(EndpointInterface $endpoint) {
+        foreach ($endpoint->getValidators() as $validator) {
+            if (!($validator instanceof validators\ValidatorInterface)) {
+                throw new validators\ValidatorException('Invalid validator', 400);                
+            }
+            if (!$validator->validate($this->params)) {
+                throw new validators\ValidatorException($validator->getMessage(), 400);
+            }
+        }
+        return true;
+    }
+
+    private function addObservers(EndpointInterface $endpoint) {
+        foreach ($endpoint->getObservers() as $observer) {
+            $this->controller->addObserver($observer);
+        }
+    }
+
+    function loadControllerFile() {
         $controller_name = ucwords($this->route->getController());
         $controller_class = 'application\\controllers\\' . $controller_name . 'Controller';
         try {
@@ -71,11 +100,9 @@ class Application {
         }
     }
 
-    public function run() {
-        if ($this->controller->runValidators()) {
-            $method_name = $this->route->getAction();
-            $this->controller->$method_name();
-        }
+    function run() {
+        $method_name = $this->route->getAction();
+        $this->controller->$method_name();
     }
 
 }
