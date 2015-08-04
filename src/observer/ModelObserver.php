@@ -10,7 +10,7 @@ namespace vsf\observer;
 class ModelObserver implements ObserverInterface {
 
     public function update($channel, $subject, $data) {
-        $log = new \Monolog\Logger($channel);
+        $log = new \Monolog\Logger(__CLASS__.'.'.$channel);
         $log->addNotice($subject, $data);
     }
 

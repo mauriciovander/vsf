@@ -9,7 +9,7 @@ namespace vsf\response;
 
 // Concrete Factory:
 // Response for APIcontext
-class ApiResponse implements \vsf\ResponseInterface {
+class ApiResponse implements ResponseInterface {
 
     private $template;
 

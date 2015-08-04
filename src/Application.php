@@ -46,9 +46,7 @@ class Application {
     private function loadActionConfig() {
         try {
             $endpoint_name = '\\application\\endpoints\\'
-                    . $this->route->getController()
-                    . '\\'
-                    . $this->route->getAction();
+                    . $this->route->getController() . '\\' . $this->route->getAction();
 
             if (class_exists($endpoint_name)) {
                 $endpoint = new $endpoint_name ();
@@ -71,7 +69,7 @@ class Application {
 
     private function checkValidContext(EndpointInterface $endpoint) {
         if (!in_array($this->context, $endpoint->getValidContexts())) {
-            throw new UnknownContextException($this->context, 400);
+            throw new UnknownContextException($this->context, 404);
         }
     }
 
@@ -88,10 +86,10 @@ class Application {
     private function runValidators(EndpointInterface $endpoint) {
         foreach ($endpoint->getValidators() as $validator) {
             if (!($validator instanceof validators\ValidatorInterface)) {
-                throw new validators\ValidatorException('Invalid validator', 400);
+                throw new validators\ValidatorException('Invalid validator', 403);
             }
             if (!$validator->validate($this->params)) {
-                throw new validators\ValidatorException($validator->getMessage(), 400);
+                throw new validators\ValidatorException($validator->getMessage(), 403);
             }
         }
         return true;
@@ -109,7 +107,7 @@ class Application {
         try {
             $this->controller = new $controller_class($this->params, $this->response);
         } catch (Exception $e) {
-            throw new ControllerNotFoundException($controller_name, 400, $e);
+            throw new ControllerNotFoundException($controller_name, 404, $e);
         }
     }
 

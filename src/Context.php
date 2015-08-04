@@ -68,7 +68,7 @@ class Context {
  */
 class UnknownContextException extends \Exception {
 
-    public function __construct($message = null, $code = 500, \Exception $previous = null) {
+    public function __construct($message = null, $code = 404, \Exception $previous = null) {
         parent::__construct($message, $code, $previous);
         $log = new \Monolog\Logger('Context');
         $log->addError('Unknown context. ' . $message);
