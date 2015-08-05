@@ -48,7 +48,7 @@
                     $host = filter_input(INPUT_SERVER, 'HTTP_HOST');
                     $protocol = 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://';
                     ?>
-                    <a href="<?php echo $protocol . $host; ?>"><?php echo $protocol . $host; ?>/<span>controller</span>/<span>action</span>/param1/param2/...</a>
+                    <a href="<?php echo $protocol . $host; ?>"><?php echo $protocol . $host; ?>/<span>controller</span>/<span>action</span>/id/1/amount/39.99/quantity/2/version/1.0</a>
                 </p>
                 <pre><?php var_dump($input); ?></pre>
 
